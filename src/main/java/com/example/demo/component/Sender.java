@@ -6,15 +6,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.stream.ByteCapacity;
 import com.rabbitmq.stream.Environment;
 import com.rabbitmq.stream.Producer;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class RabbitStreamStarter {
-    RabbitStreamStarter() {
-        Thread t = new SendThread();
-        t.start();
+public class Sender {
+    @PostConstruct
+    void init() {
+        for (int i = 0; i < 100; ++i) {
+            Thread t = new SendThread();
+            t.start();
+        }
     }
 }
 
@@ -37,7 +41,6 @@ class SendThread extends Thread {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(message);
         producer.send(producer.messageBuilder().addData(message.getBytes()).build(), null);
         System.out.println(" [x] 'gcc --version' message sent");
     }
